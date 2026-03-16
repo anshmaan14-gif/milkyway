@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MilkyWay - Buy & Sell Milk</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f5fbff;
+}
+
+header{
+background:#0b6efd;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+nav a{
+color:white;
+margin:10px;
+text-decoration:none;
+font-weight:bold;
+cursor:pointer;
+}
+
+section{
+display:none;
+padding:40px;
+}
+
+.active{
+display:block;
+}
+
+/* HOME */
+
+.hero{
+height:70vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+}
+
+.hero h1{
+font-size:60px;
+color:#0b6efd;
+}
+
+.milk{
+width:120px;
+height:120px;
+background:white;
+border-radius:50%;
+animation:float 3s infinite;
+box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-20px)}
+100%{transform:translateY(0)}
+}
+
+/* cards */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+button{
+background:#0b6efd;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+margin-top:10px;
+}
+
+input{
+display:block;
+margin:10px auto;
+padding:10px;
+width:250px;
+}
+
+.box{
+width:300px;
+margin:20px auto;
+padding:20px;
+background:white;
+border-radius:10px;
+box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+
+footer{
+background:#0b6efd;
+color:white;
+text-align:center;
+padding:15px;
+margin-top:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h2>🥛 MilkyWay</h2>
+
+<nav>
+<a onclick="showPage('home')">Home</a>
+<a onclick="showPage('marketplace')">Marketplace</a>
+<a onclick="showPage('products')">Products</a>
+<a onclick="showPage('account')">Account</a>
+</nav>
+
+</header>
+
+
+<!-- HOME -->
+
+<section id="home" class="active">
+
+<div class="hero">
+
+<div class="milk"></div>
+
+<h1>MilkyWay</h1>
+
+<p>
+Buy fresh milk and dairy products directly from nearby sellers.
+Find farms within 10-15 km and enjoy fresh dairy every day.
+</p>
+
+</div>
+
+<h2>Our Milk Products</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>Fresh Cow Milk</h3>
+<p>Organic farm milk</p>
+</div>
+
+<div class="card">
+<h3>Buffalo Milk</h3>
+<p>High fat dairy milk</p>
+</div>
+
+<div class="card">
+<h3>Paneer</h3>
+<p>Fresh homemade paneer</p>
+</div>
+
+<div class="card">
+<h3>Butter</h3>
+<p>Pure dairy butter</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MARKETPLACE -->
+
+<section id="marketplace">
+
+<h1>Marketplace</h1>
+
+<div style="text-align:center">
+
+<button onclick="showSeller()">Seller</button>
+<button onclick="showBuyer()">Buyer</button>
+
+</div>
+
+<div id="sellerForm" style="display:none">
+
+<h2>Seller Registration</h2>
+
+<input placeholder="Name">
+<input placeholder="Mobile Number">
+<input placeholder="Address">
+<input placeholder="Products (Milk, Paneer etc)">
+<input placeholder="Price">
+
+<button>Register Seller</button>
+
+</div>
+
+
+<div id="buyerArea" style="display:none">
+
+<h2>Find Sellers Near You</h2>
+
+<button onclick="getLocation()">Allow GPS & Find Sellers</button>
+
+<p id="location"></p>
+
+</div>
+
+</section>
+
+
+<!-- PRODUCTS -->
+
+<section id="products">
+
+<h1>Milk Products Marketplace</h1>
+
+<div class="grid">
+
+<div class="card">
+<h3>Cow Milk</h3>
+<p>₹60 / litre</p>
+<button onclick="addCart('Cow Milk')">Add to Cart</button>
+</div>
+
+<div class="card">
+<h3>Buffalo Milk</h3>
+<p>₹70 / litre</p>
+<button onclick="addCart('Buffalo Milk')">Add to Cart</button>
+</div>
+
+<div class="card">
+<h3>Paneer</h3>
+<p>₹350 / kg</p>
+<button onclick="addCart('Paneer')">Add to Cart</button>
+</div>
+
+<div class="card">
+<h3>Butter</h3>
+<p>₹500 / kg</p>
+<button onclick="addCart('Butter')">Add to Cart</button>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ACCOUNT -->
+
+<section id="account">
+
+<h1>Your Account</h1>
+
+<div class="box">
+
+<h3>Cart</h3>
+
+<ul id="cartList"></ul>
+
+</div>
+
+<div class="box">
+
+<h3>Orders</h3>
+
+<p>No orders yet</p>
+
+</div>
+
+<div class="box">
+
+<h3>Track Order</h3>
+
+<input placeholder="Enter Order ID">
+<button>Track</button>
+
+</div>
+
+</section>
+
+
+<footer>
+© 2026 MilkyWay Marketplace
+</footer>
+
+
+<script>
+
+function showPage(page){
+
+document.querySelectorAll("section").forEach(s=>{
+s.classList.remove("active")
+})
+
+document.getElementById(page).classList.add("active")
+
+}
+
+
+function showSeller(){
+document.getElementById("sellerForm").style.display="block"
+document.getElementById("buyerArea").style.display="none"
+}
+
+function showBuyer(){
+document.getElementById("buyerArea").style.display="block"
+document.getElementById("sellerForm").style.display="none"
+}
+
+
+function getLocation(){
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(function(pos){
+
+document.getElementById("location").innerHTML =
+"Latitude: "+pos.coords.latitude+
+"<br>Longitude: "+pos.coords.longitude+
+"<br>Searching sellers within 15 km..."
+
+})
+
+}
+
+}
+
+
+let cart=[]
+
+function addCart(item){
+
+cart.push(item)
+
+let list=document.getElementById("cartList")
+
+let li=document.createElement("li")
+
+li.textContent=item
+
+list.appendChild(li)
+
+}
+
+</script>
+
+
+</body>
+</html>
