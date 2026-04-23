@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Park Experience</title>
+
+<style>
+body { margin: 0; overflow: hidden; }
+#joystick {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+}
+</style>
+</head>
+
+<body>
+
+<div id="joystick"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+
+<script>
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Lighting
+let light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+scene.add(light);
+
+// Ground
+let groundGeo = new THREE.PlaneGeometry(100,100);
+let groundMat = new THREE.MeshStandardMaterial({color:0x2e3d2f});
+let ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI/2;
+scene.add(ground);
+
+// Path
+let pathGeo = new THREE.PlaneGeometry(10,100);
+let pathMat = new THREE.MeshStandardMaterial({color:0x555555});
+let path = new THREE.Mesh(pathGeo, pathMat);
+path.rotation.x = -Math.PI/2;
+scene.add(path);
+
+// Gate
+let pillarGeo = new THREE.BoxGeometry(1,5,1);
+let pillarMat = new THREE.MeshStandardMaterial({color:0x444444});
+
+let leftPillar = new THREE.Mesh(pillarGeo, pillarMat);
+leftPillar.position.set(-3,2.5,-5);
+scene.add(leftPillar);
+
+let rightPillar = new THREE.Mesh(pillarGeo, pillarMat);
+rightPillar.position.set(3,2.5,-5);
+scene.add(rightPillar);
+
+let topGate = new THREE.Mesh(new THREE.BoxGeometry(6,1,1), pillarMat);
+topGate.position.set(0,5,-5);
+scene.add(topGate);
+
+// Load car image as texture
+let loader = new THREE.TextureLoader();
+let carTexture = loader.load("car.png");
+
+let carGeo = new THREE.PlaneGeometry(5,2.5);
+let carMat = new THREE.MeshBasicMaterial({map: carTexture, transparent:true});
+let car = new THREE.Mesh(carGeo, carMat);
+car.position.set(-6,1,5);
+scene.add(car);
+
+// Camera start
+camera.position.set(0,1.8,10);
+
+// Movement
+let keys = {};
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+
+// Mouse look
+let yaw = 0, pitch = 0;
+document.addEventListener("mousemove", (e) => {
+  yaw -= e.movementX * 0.002;
+  pitch -= e.movementY * 0.002;
+  pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitch));
+});
+
+// Mobile joystick
+let joy = {x:0,y:0};
+let joystick = document.getElementById("joystick");
+
+joystick.addEventListener("touchmove", (e)=>{
+  let rect = joystick.getBoundingClientRect();
+  let x = e.touches[0].clientX - rect.left - 50;
+  let y = e.touches[0].clientY - rect.top - 50;
+  joy.x = x/50;
+  joy.y = y/50;
+});
+
+// Animation loop
+function animate(){
+  requestAnimationFrame(animate);
+
+  // Direction
+  let dir = new THREE.Vector3(
+    Math.sin(yaw),
+    0,
+    Math.cos(yaw)
+  );
+
+  let right = new THREE.Vector3(
+    Math.sin(yaw - Math.PI/2),
+    0,
+    Math.cos(yaw - Math.PI/2)
+  );
+
+  // Movement (PC)
+  if(keys["w"]) camera.position.add(dir.clone().multiplyScalar(-0.1));
+  if(keys["s"]) camera.position.add(dir.clone().multiplyScalar(0.1));
+  if(keys["a"]) camera.position.add(right.clone().multiplyScalar(0.1));
+  if(keys["d"]) camera.position.add(right.clone().multiplyScalar(-0.1));
+
+  // Movement (mobile)
+  camera.position.add(dir.clone().multiplyScalar(-joy.y * 0.1));
+  camera.position.add(right.clone().multiplyScalar(-joy.x * 0.1));
+
+  // Apply rotation
+  camera.rotation.order = "YXZ";
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// Resize
+window.addEventListener("resize", ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+</html>
